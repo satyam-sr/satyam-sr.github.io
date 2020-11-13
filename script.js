@@ -271,6 +271,18 @@ var onDrop = function (source, target) {
         promotion: 'q'
     });
 
+    if (chess.is_promotion({
+        chess: chess,
+        move: {from: source, to: target}
+    }) ) {
+
+       choose_piece({
+            onchosen: function(piece) {
+                  chess.move({ from: from, to: to, promotion: piece.code });
+             }
+       });
+    }
+
     removeGreySquares();
     if (move === null) {
         return 'snapback';
@@ -279,6 +291,29 @@ var onDrop = function (source, target) {
     renderMoveHistory(game.history());
     window.setTimeout(makeBestMove(true), 600);
 };
+
+var is_promotion = function(cfg) {
+    var piece = cfg.chess.get(cfg.move.from);
+    if (
+           (cfg.chess.turn() == 'w' &&
+           cfg.move.from.charAt(1) == 7 &&
+           cfg.move.to.charAt(1) == 8 &&
+           piece.type == 'p' &&
+           piece.color == 'w') ||
+           (cfg.chess.turn() == 'b' &&
+           cfg.move.from.charAt(1) == 2 &&
+           cfg.move.to.charAt(1) == 1 &&
+           piece.type == 'p' &&
+           piece.color == 'b')
+    ) {
+           var temp_chess = chess.fen();
+           if ( temp_chess.move({from: cfg.move.from, to: cfg.move.to, promotion: 'q'}) ) {
+                 return true;
+           } else {
+                 return false;
+           }
+    }
+}
 
 var onSnapEnd = function () {
     board.position(game.fen());
@@ -319,6 +354,7 @@ var greySquare = function(square) {
 };
 
 $('#blackOrientationBtn').on('click', function () {
+    this.disabled = true
     board.orientation('black')
     isWhite = false
     makeBestMove(true)
