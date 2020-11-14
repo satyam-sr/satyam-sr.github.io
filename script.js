@@ -9,12 +9,14 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 
     if(isMaximisingPlayer) {
         var bestMove = -9999;
+        var value = -9999;
         var bestMoveFound;
 
         for(var i = 0; i < newGameMoves.length; i++) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
-            var value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+            if(!game.in_threefold_repetition())
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
             game.undo();
             if(value >= bestMove) {
                 bestMove = value;
@@ -26,11 +28,13 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     } else {
         var bestMove = 9999;
         var bestMoveFound;
+        var value = 9999;
 
         for(var i = 0; i < newGameMoves.length; i++) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
-            var value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+            if(!game.in_threefold_repetition())
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
             game.undo();
             if(value <= bestMove) {
                 bestMove = value;
@@ -54,7 +58,8 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         var bestMove = -9999;
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
-            bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+            // if(!game.in_threefold_repetition())
+                bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
             game.undo();
             alpha = Math.max(alpha, bestMove);
             if (beta <= alpha) {
@@ -66,7 +71,8 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         var bestMove = 9999;
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
-            bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+            // if(!game.in_threefold_repetition())
+                bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
             game.undo();
             beta = Math.min(beta, bestMove);
             if (beta <= alpha) {
@@ -222,12 +228,12 @@ var makeBestMove = function (isWhite) {
 };
 
 var handleGameOver = function(game) {
-    if (game.in_draw()) window.setTimeout(alert('Game Drawn'),1500)
-    else if (game.in_stalemate())  window.setTimeout(alert('Stalemate ! Game Drawn'),1500)
-    else if (game.in_threefold_repetition()) window.setTimeout(alert('Three moves repeated ! Game Drawn'),1500)
+    if (game.in_draw()) window.setTimeout(alert('Game Drawn'),600)
+    else if (game.in_stalemate())  window.setTimeout(alert('Stalemate ! Game Drawn'),600)
+    else if (game.in_threefold_repetition()) window.setTimeout(alert('Three moves repeated ! Game Drawn'),600)
     else {
-        if(game.turn() == 'w') window.setTimeout(alert('Black Won'),1000)
-        else window.setTimeout(alert('White Won'),1500)
+        if(game.turn() == 'w') window.setTimeout(alert('Black Won'),600)
+        else window.setTimeout(alert('White Won'),600)
     }
 }
 
@@ -271,18 +277,6 @@ var onDrop = function (source, target) {
         promotion: 'q'
     });
 
-    if (chess.is_promotion({
-        chess: chess,
-        move: {from: source, to: target}
-    }) ) {
-
-       choose_piece({
-            onchosen: function(piece) {
-                  chess.move({ from: from, to: to, promotion: piece.code });
-             }
-       });
-    }
-
     removeGreySquares();
     if (move === null) {
         return 'snapback';
@@ -291,29 +285,6 @@ var onDrop = function (source, target) {
     renderMoveHistory(game.history());
     window.setTimeout(makeBestMove(true), 600);
 };
-
-var is_promotion = function(cfg) {
-    var piece = cfg.chess.get(cfg.move.from);
-    if (
-           (cfg.chess.turn() == 'w' &&
-           cfg.move.from.charAt(1) == 7 &&
-           cfg.move.to.charAt(1) == 8 &&
-           piece.type == 'p' &&
-           piece.color == 'w') ||
-           (cfg.chess.turn() == 'b' &&
-           cfg.move.from.charAt(1) == 2 &&
-           cfg.move.to.charAt(1) == 1 &&
-           piece.type == 'p' &&
-           piece.color == 'b')
-    ) {
-           var temp_chess = chess.fen();
-           if ( temp_chess.move({from: cfg.move.from, to: cfg.move.to, promotion: 'q'}) ) {
-                 return true;
-           } else {
-                 return false;
-           }
-    }
-}
 
 var onSnapEnd = function () {
     board.position(game.fen());
