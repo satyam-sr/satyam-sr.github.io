@@ -245,7 +245,6 @@ var getBestMove = function (game, isWhite) {
     }
 
     positionCount = 0;
-    var depth = parseInt($('#search-depth').find(':selected').text());
 
     var d = new Date().getTime();
     var bestMove = minimaxRoot(depth, game, isWhite);
@@ -283,7 +282,7 @@ var onDrop = function (source, target) {
     }
 
     renderMoveHistory(game.history());
-    window.setTimeout(makeBestMove(true), 600);
+    window.setTimeout(makeBestMove(true), 2000);
 };
 
 var onSnapEnd = function () {
@@ -331,7 +330,19 @@ $('#blackOrientationBtn').on('click', function () {
     makeBestMove(true)
 })
 
+$(":radio").click(function(){
+    var radioName = $(this).attr("name"); 
+    $(":radio[name='"+radioName+"']").attr("disabled", true); 
+ });
+
+ var update = function(level){
+     if(level == 'expert') depth = 4; 
+     else if(level == 'basic') depth = 1;
+
+ }
+
 var isWhite= true
+var depth = 3
 
 var cfg = {
     draggable: true,
