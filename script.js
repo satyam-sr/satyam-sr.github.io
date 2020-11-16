@@ -215,6 +215,12 @@ var onDragStart = function (source, piece, position, orientation) {
         piece.search(pat) !== -1) {
         return false;
     }
+    if(blackBtnDisabled == false) document.getElementById("blackOrientationBtn").disabled= true
+    if(levelButtonDisabled == false) {
+        document.getElementById("m1").disabled= true
+        document.getElementById("m2").disabled= true
+        document.getElementById("m3").disabled= true
+    }
 };
 
 var makeBestMove = function (isWhite) {
@@ -325,14 +331,17 @@ var greySquare = function(square) {
 
 $('#blackOrientationBtn').on('click', function () {
     this.disabled = true
+    document.getElementById("msg").innerHTML = "You are playing with Black !!";
     board.orientation('black')
     isWhite = false
+    disableBlack = true
     makeBestMove(true)
 })
 
 $(":radio").click(function(){
     var radioName = $(this).attr("name"); 
     $(":radio[name='"+radioName+"']").attr("disabled", true); 
+    levelButtonDisabled = true
  });
 
  var update = function(level){
@@ -343,6 +352,8 @@ $(":radio").click(function(){
 
 var isWhite= true
 var depth = 3
+var blackBtnDisabled = false
+var levelButtonDisabled = false
 
 var cfg = {
     draggable: true,

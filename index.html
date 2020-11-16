@@ -10,13 +10,13 @@
 <body>
 <div class="flexUI">
 <div id="form">
-    <h2>Welcome Visitor. Be ready for a good game of chess</h2>
+    <h2>Welcome Visitor. Be ready for a good game of chess !!</h2>
     <p>Select Difficulty level</p>
-    Basic <input type="radio" name="match1" onclick="update('basic');" />
-    Moderate <input type="radio" name="match1" onclick="update('moderate');" />
-    Expert <input type="radio" name="match1" onclick="update('expert');" />
-    <p>You are playing with White !!</p>
-    <button id="blackOrientationBtn">Play with Black</button>
+    Basic <input type="radio" id="m1" name="match1" onclick="update('basic');" />
+    Moderate <input type="radio" id="m2" name="match1" onclick="update('moderate');" checked/>
+    Expert <input type="radio" id="m3" name="match1" onclick="update('expert');" />
+    <p id="msg">You are playing with White !!</p>
+    <button id="blackOrientationBtn" onclick="disableBlack();">Play with Black</button>
 
     <div class="info">
         <br>
@@ -31,9 +31,7 @@
         </div>
     </div>
 </div>
- <div id="main">
 <div id="board" class="board"></div>
-</div>
 <script src="lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="lib/chessboardjs/js/chess.js"></script>
 <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
