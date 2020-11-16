@@ -22,6 +22,22 @@
     flex-direction: column;
     align-items: center;
   }
+
+  #main {
+    width: 60%;
+    margin: auto;
+    margin-top: 40px;
+    justify-content: center;
+    flex: 70%;
+ }
+
+ #form {
+    width: 70%;
+    margin: auto;
+    margin-top: 40px;
+    justify-content: center;
+    flex: 30%;
+ }
 }
 
 /* #board {
