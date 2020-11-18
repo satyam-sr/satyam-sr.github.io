@@ -1,5 +1,5 @@
 var board,
-    game = new Chess();
+    game = new Chess();   
 
 /*The "AI" part starts here */
 
@@ -49,7 +49,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     positionCount++;
     if (depth === 0) {
-        return -evaluateBoard(game.board());
+        return -evaluateBoard(game.board(), false);
     }
 
     var newGameMoves = game.ugly_moves();
@@ -83,13 +83,14 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     }
 };
 
-var evaluateBoard = function (board) {
+var evaluateBoard = function (board, log) {
     var totalEvaluation = 0;
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
             totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
         }
     }
+    totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
     return totalEvaluation;
 };
 
@@ -181,6 +182,7 @@ var getPieceValue = function (piece, x, y) {
     if (piece === null) {
         return 0;
     }
+
     var getAbsoluteValue = function (piece, isWhite, x ,y) {
         if (piece.type === 'p') {
             return 10 + ( isWhite ? pawnEvalWhite[y][x] : pawnEvalBlack[y][x] );
@@ -199,9 +201,46 @@ var getPieceValue = function (piece, x, y) {
     };
 
     var absoluteValue = getAbsoluteValue(piece, piece.color === 'w', x ,y);
-    let playerCol = (isWhite === true) ? 'w' : 'b'
     return piece.color === playerCol ? absoluteValue : -absoluteValue;
 };
+
+var getPawnStructureScore = function(board, log) {
+
+    var doubledPawns = 0; 
+    let ar = new Array()
+
+   for(var i=0;i<8;i++){
+       let countInFile = 0;
+
+       for(var j=0;j<8;j++){
+            let piece = board[j][i];
+            if(piece != null && piece.type ==='p' && piece.color === playerCol) countInFile = countInFile+1;    
+       }
+
+       if(countInFile > 1) doubledPawns = doubledPawns + countInFile;
+       ar.push(countInFile)
+   }   
+   
+   if(log) console.log("array "+ar)
+   let isolatedPawns = 0 ;
+   for(var i=0;i<8;i++){
+       if(ar[i] > 0){
+           if((i-1 >= 0 && ar[i-1] != 0) || (i+1 < 8 && ar[i+1] != 0)) {
+           } else {
+                isolatedPawns = isolatedPawns + ar[i];
+           }
+       }
+   }
+
+   let penalty = (doubledPawns + isolatedPawns) * 3;
+   
+   if(log) console.log("isolatedPawn "+isolatedPawns+ " doubled pawns "+doubledPawns);
+   return -penalty;
+}
+
+var getIsolatedPawnPenalty = function (board) {
+
+}
 
 
 /* board visualization and games state handling */
@@ -286,7 +325,7 @@ var onDrop = function (source, target) {
     if (move === null) {
         return 'snapback';
     }
-
+    evaluateBoard(game.board(), true)
     renderMoveHistory(game.history());
     window.setTimeout(makeBestMove(true), 2000);
 };
@@ -335,6 +374,7 @@ $('#blackOrientationBtn').on('click', function () {
     board.orientation('black')
     isWhite = false
     disableBlack = true
+    playerCol = 'b'
     makeBestMove(true)
 })
 
@@ -354,6 +394,7 @@ var isWhite= true
 var depth = 3
 var blackBtnDisabled = false
 var levelButtonDisabled = false
+var playerCol =  'w' 
 
 var cfg = {
     draggable: true,
