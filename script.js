@@ -189,13 +189,13 @@ var getPieceValue = function (piece, x, y) {
         } else if (piece.type === 'r') {
             return 50 + ( isWhite ? rookEvalWhite[y][x] : rookEvalBlack[y][x] );
         } else if (piece.type === 'n') {
-            return 30 + knightEval[y][x];
+            return 32 + knightEval[y][x];
         } else if (piece.type === 'b') {
-            return 30 + ( isWhite ? bishopEvalWhite[y][x] : bishopEvalBlack[y][x] );
+            return 33 + ( isWhite ? bishopEvalWhite[y][x] : bishopEvalBlack[y][x] );
         } else if (piece.type === 'q') {
             return 90 + evalQueen[y][x];
         } else if (piece.type === 'k') {
-            return 900 + ( isWhite ? kingEvalWhite[y][x] : kingEvalBlack[y][x] );
+            return 1000 + ( isWhite ? kingEvalWhite[y][x] : kingEvalBlack[y][x] );
         }
         throw "Unknown piece type: " + piece.type;
     };
