@@ -83,11 +83,20 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     }
 };
 
+var endgame = false 
+
+var isEndgame = function(board){
+    if(endgame == true) return true ;  
+
+
+}
+
 var evaluateBoard = function (board, log) {
+    let endgame = isEndgame(board)
     var totalEvaluation = 0;
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
-            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
+            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j, endgame);
         }
     }
     totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
@@ -175,10 +184,23 @@ var kingEvalWhite = [
 
 var kingEvalBlack = reverseArray(kingEvalWhite);
 
+var kingEndGameWhite = [
+    [ -5.0, -4.0, -3.0, -2.0, -2.0, -3.0, -4.0, -5.0],
+    [ -3.0, -2.0, -1.0,  0.0,  0.0, -1.0, -2.0, -3.0],
+    [ -3.0, -1.0,  2.0,  3.0,  3.0,  2.0, -1.0, -3.0],
+    [ -3.0, -1.0,  3.0,  4.0,  4.0,  3.0, -1.0, -3.0],
+    [ -3.0, -1.0,  3.0,  4.0,  4.0,  3.0, -1.0, -3.0],
+    [ -3.0, -1.0,  2.0,  3.0,  3.0,  2.0, -1.0, -3.0],
+    [ -3.0, -3.0,  0.0,  0.0,  0.0,  0.0, -3.0, -3.0],
+    [ -5.0, -3.0, -3.0, -3.0, -3.0, -3.0, -3.0, -5.0]
+];
+
+var kingEndGameBlack = reverseArray(kingEndGameWhite);
 
 
 
-var getPieceValue = function (piece, x, y) {
+
+var getPieceValue = function (piece, x, y, endgame) {
     if (piece === null) {
         return 0;
     }
@@ -195,6 +217,8 @@ var getPieceValue = function (piece, x, y) {
         } else if (piece.type === 'q') {
             return 90 + evalQueen[y][x];
         } else if (piece.type === 'k') {
+            // if(endgame) 1000 + (isWhite ? kingEndGameWhite[y][x] : kingEndGameBlack[y][x]);
+            // else 
             return 1000 + ( isWhite ? kingEvalWhite[y][x] : kingEvalBlack[y][x] );
         }
         throw "Unknown piece type: " + piece.type;
@@ -207,22 +231,29 @@ var getPieceValue = function (piece, x, y) {
 var getPawnStructureScore = function(board, log) {
 
     var doubledPawns = 0; 
+    var doubledPwanOpp = 0
     let ar = new Array()
+    let br = new Array()
 
    for(var i=0;i<8;i++){
        let countInFile = 0;
+       let countInFileOpp = 0;
 
        for(var j=0;j<8;j++){
             let piece = board[j][i];
-            if(piece != null && piece.type ==='p' && piece.color === playerCol) countInFile = countInFile+1;    
+            if(piece != null && piece.type ==='p' && piece.color === playerCol) countInFile = countInFile+1;
+            if(piece != null && piece.type ==='p' && piece.color === oppositePlayerCol) countInFileOpp = countInFileOpp+1;   
        }
 
        if(countInFile > 1) doubledPawns = doubledPawns + countInFile;
+       if(countInFileOpp > 1) doubledPwanOpp = doubledPwanOpp + countInFileOpp;
        ar.push(countInFile)
+       br.push(countInFileOpp)
    }   
    
    if(log) console.log("array "+ar)
    let isolatedPawns = 0 ;
+   let isolatedPawnsOpp = 0;
    for(var i=0;i<8;i++){
        if(ar[i] > 0){
            if((i-1 >= 0 && ar[i-1] != 0) || (i+1 < 8 && ar[i+1] != 0)) {
@@ -230,16 +261,19 @@ var getPawnStructureScore = function(board, log) {
                 isolatedPawns = isolatedPawns + ar[i];
            }
        }
+       if(br[i] > 0){
+        if((i-1 >= 0 && br[i-1] != 0) || (i+1 < 8 && br[i+1] != 0)) {
+        } else {
+            isolatedPawnsOpp = isolatedPawnsOpp + br[i];
+        }
+    }
    }
 
-   let penalty = (doubledPawns + isolatedPawns) * 3;
+   let penalty = (doubledPwanOpp + isolatedPawnsOpp) * 3;
+   let bonus = (doubledPawns + isolatedPawns) * 3;
    
    if(log) console.log("isolatedPawn "+isolatedPawns+ " doubled pawns "+doubledPawns);
-   return -penalty;
-}
-
-var getIsolatedPawnPenalty = function (board) {
-
+   return bonus-penalty;
 }
 
 
@@ -247,7 +281,6 @@ var getIsolatedPawnPenalty = function (board) {
 
 var onDragStart = function (source, piece, position, orientation) {
     console.log("piece "+piece)
-    let oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
     let pat = '/^'+oppositePlayerCol+'/'
     console.log("player "+oppositePlayerCol)
     if (game.in_checkmate() === true || game.in_draw() === true ||
@@ -395,6 +428,7 @@ var depth = 3
 var blackBtnDisabled = false
 var levelButtonDisabled = false
 var playerCol =  'w' 
+var oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
 
 var cfg = {
     draggable: true,
