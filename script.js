@@ -4,9 +4,10 @@ var board,
 /*The "AI" part starts here */
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
-
+    console.log("depth "+depth)
     var newGameMoves = game.ugly_moves();
-
+    // let endgame = isEndgame(game.board());
+    let endgame = false;
     if(isMaximisingPlayer) {
         var bestMove = -9999;
         var value = -9999;
@@ -16,7 +17,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
             if(!game.in_threefold_repetition())
-                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer, endgame);
             game.undo();
             if(value >= bestMove) {
                 bestMove = value;
@@ -34,7 +35,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
             if(!game.in_threefold_repetition())
-                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer, endgame);
             game.undo();
             if(value <= bestMove) {
                 bestMove = value;
@@ -46,10 +47,10 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     }
 };
 
-var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
+var minimax = function (depth, game, alpha, beta, isMaximisingPlayer, isEndgame) {
     positionCount++;
     if (depth === 0) {
-        return -evaluateBoard(game.board(), false);
+        return -evaluateBoard(game.board(), false, isEndgame);
     }
 
     var newGameMoves = game.ugly_moves();
@@ -59,7 +60,7 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
             // if(!game.in_threefold_repetition())
-                bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+                bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer, isEndgame));
             game.undo();
             alpha = Math.max(alpha, bestMove);
             if (beta <= alpha) {
@@ -72,7 +73,7 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
             // if(!game.in_threefold_repetition())
-                bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+                bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer, isEndgame));
             game.undo();
             beta = Math.min(beta, bestMove);
             if (beta <= alpha) {
@@ -88,18 +89,80 @@ var endgame = false
 var isEndgame = function(board){
     if(endgame == true) return true ;  
 
+    let pieceCount = new Map()
+    for(var i=0; i<8; i++){
+        for(j =0; j<8 ; j++){
+            let piece = board[i][j];
 
-}
+            if(piece == 'b' && piece.color == 'b'){
+                if(pieceCount.has('blackBishop')) pieceCount['blackBishop']= pieceCount['blackBishop']+1;
+                else pieceCount['blackBishop'] = 1;
+            }
 
-var evaluateBoard = function (board, log) {
-    let endgame = isEndgame(board)
-    var totalEvaluation = 0;
-    for (var i = 0; i < 8; i++) {
-        for (var j = 0; j < 8; j++) {
-            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j, endgame);
+            else if(piece == 'b' && piece.color == 'w'){
+                if(pieceCount.has('whiteBishop')) pieceCount['whiteBishop']= pieceCount['whiteBishop']+1;
+                else pieceCount['whiteBishop'] = 1;
+            }
+
+            else if(piece == 'n' && piece.color == 'b'){
+                if(pieceCount.has('blackKnight')) pieceCount['blackKnight']= pieceCount['blackKnight']+1;
+                else pieceCount['blackKnight'] = 1;
+            }
+
+            else if(piece == 'n' && piece.color == 'w'){
+                if(pieceCount.has('whiteKnight')) pieceCount['whiteKnight']= pieceCount['whiteKnight']+1;
+                else pieceCount['whiteKnight'] = 1;
+            }
+
+            else if(piece == 'r' && piece.color == 'b'){
+                if(pieceCount.has('blackRook')) pieceCount['blackRook']= pieceCount['blackRook']+1;
+                else pieceCount['blackRook'] = 1;
+            }
+            else if(piece == 'r' && piece.color == 'w'){
+                if(pieceCount.has('whiteRook')) pieceCount['whiteRook']= pieceCount['whiteRook']+1;
+                else pieceCount['whiteRook'] = 1;
+            }
+            else if(piece == 'q' && piece.color == 'b'){
+                if(pieceCount.has('blackQueen')) pieceCount['blackQueen']= pieceCount['blackQueen']+1;
+                else pieceCount['blackQueen'] = 1;
+            }
+            else if(piece == 'q' && piece.color == 'w'){
+                if(pieceCount.has('whiteQueen')) pieceCount['whiteQueen']= pieceCount['whiteQueen']+1;
+                else pieceCount['whiteQueen'] = 1;
+            }
         }
     }
-    totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
+
+    let totalBlack = pieceCount['blackBishop']+pieceCount['blackQueen']+pieceCount['blackRook']+pieceCount['blackKnight'];
+    let totalWhite = pieceCount['whiteBishop']+pieceCount['whiteQueen']+pieceCount['whiteRook']+pieceCount['whiteKnight']
+
+    if(totalBlack > 2 || totalWhite > 2) return false;
+
+    if((totalBlack ==2 && pieceCount['blackQueen'] == 1) || (totalWhite == 2 && pieceCount['whiteQueen'] == 1))
+        return false;
+
+    if(pieceCount['blackRook'] == 2 || pieceCount['whiteRook'] == 2) return false; 
+    
+    endgame = true;
+    return true;
+}
+
+var evaluateBoard = function (board, log, isEndgame) {
+    var totalEvaluation = 0;
+    // if(isEndgame) {
+    //     for (var i = 0; i < 8; i++) {
+    //         for (var j = 0; j < 8; j++) {
+    //             totalEvaluation = totalEvaluation + getPieceValueEndgame(board[i][j], i ,j);
+    //         }
+    //     }
+    // } else {
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
+        }
+    }
+// }
+    // totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
     return totalEvaluation;
 };
 
@@ -200,7 +263,7 @@ var kingEndGameBlack = reverseArray(kingEndGameWhite);
 
 
 
-var getPieceValue = function (piece, x, y, endgame) {
+var getPieceValue = function (piece, x, y) {
     if (piece === null) {
         return 0;
     }
@@ -217,9 +280,33 @@ var getPieceValue = function (piece, x, y, endgame) {
         } else if (piece.type === 'q') {
             return 90 + evalQueen[y][x];
         } else if (piece.type === 'k') {
-            // if(endgame) 1000 + (isWhite ? kingEndGameWhite[y][x] : kingEndGameBlack[y][x]);
-            // else 
             return 1000 + ( isWhite ? kingEvalWhite[y][x] : kingEvalBlack[y][x] );
+        }
+        throw "Unknown piece type: " + piece.type;
+    };
+
+    var absoluteValue = getAbsoluteValue(piece, piece.color === 'w', x ,y);
+    return piece.color === playerCol ? absoluteValue : -absoluteValue;
+};
+
+var getPieceValueEndgame = function (piece, x, y) {
+    if (piece === null) {
+        return 0;
+    }
+
+    var getAbsoluteValue = function (piece, isWhite, x ,y) {
+        if (piece.type === 'p') {
+            return 10 + ( isWhite ? pawnEvalWhite[y][x] : pawnEvalBlack[y][x] );
+        } else if (piece.type === 'r') {
+            return 50 + ( isWhite ? rookEvalWhite[y][x] : rookEvalBlack[y][x] );
+        } else if (piece.type === 'n') {
+            return 32 + knightEval[y][x];
+        } else if (piece.type === 'b') {
+            return 33 + ( isWhite ? bishopEvalWhite[y][x] : bishopEvalBlack[y][x] );
+        } else if (piece.type === 'q') {
+            return 90 + evalQueen[y][x];
+        } else if (piece.type === 'k') {
+            return 1000 + (isWhite ? kingEndGameWhite[y][x] : kingEndGameBlack[y][x]);
         }
         throw "Unknown piece type: " + piece.type;
     };
@@ -358,9 +445,10 @@ var onDrop = function (source, target) {
     if (move === null) {
         return 'snapback';
     }
-    evaluateBoard(game.board(), true)
+    //TODO : remove next line
+    // evaluateBoard(game.board(), true)
     renderMoveHistory(game.history());
-    window.setTimeout(makeBestMove(true), 2000);
+    window.setTimeout(makeBestMove(true), 250);
 };
 
 var onSnapEnd = function () {
