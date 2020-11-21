@@ -382,8 +382,8 @@ var onDragStart = function (source, piece, position, orientation) {
     }
 };
 
-var makeBestMove = function (isWhite) {
-    var bestMove = getBestMove(game, isWhite);
+var makeBestMove = function () {
+    var bestMove = getBestMove(game);
     game.ugly_move(bestMove);
     board.position(game.fen());
     renderMoveHistory(game.history());
@@ -404,7 +404,7 @@ var handleGameOver = function(game) {
 
 
 var positionCount;
-var getBestMove = function (game, isWhite) {
+var getBestMove = function (game) {
     if (game.game_over()) {
         handleGameOver(game)
     }
@@ -412,7 +412,7 @@ var getBestMove = function (game, isWhite) {
     positionCount = 0;
 
     var d = new Date().getTime();
-    var bestMove = minimaxRoot(depth, game, isWhite);
+    var bestMove = minimaxRoot(depth, game, true);
     var d2 = new Date().getTime();
     var moveTime = (d2 - d);
     var positionsPerS = ( positionCount * 1000 / moveTime);
@@ -448,7 +448,7 @@ var onDrop = function (source, target) {
     //TODO : remove next line
     // evaluateBoard(game.board(), true)
     renderMoveHistory(game.history());
-    window.setTimeout(makeBestMove(true), 250);
+    window.setTimeout(makeBestMove, 250);
 };
 
 var onSnapEnd = function () {
@@ -496,7 +496,7 @@ $('#blackOrientationBtn').on('click', function () {
     isWhite = false
     disableBlack = true
     playerCol = 'b'
-    makeBestMove(true)
+    makeBestMove()
 })
 
 $(":radio").click(function(){
