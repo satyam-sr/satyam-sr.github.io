@@ -388,6 +388,7 @@ var makeBestMove = function () {
     game.ugly_move(bestMove);
     board.position(game.fen());
     renderMoveHistory(game.history());
+    mySound.play();
     if (game.game_over()) {
         handleGameOver(game)
     }
@@ -446,6 +447,7 @@ var onDrop = function (source, target) {
     if (move === null) {
         return 'snapback';
     }
+    mySound.play();
     //TODO : remove next line
     // evaluateBoard(game.board(), true)
     renderMoveHistory(game.history());
@@ -541,7 +543,7 @@ var blackBtnDisabled = false
 var playerCol =  'w' 
 var oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
 var gameStarted = false
-var mySound;
+var mySound = new sound("move.wav");
 
 var cfg = {
     draggable: true,
