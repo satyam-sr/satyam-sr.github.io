@@ -4,9 +4,9 @@ var board,
 /*The "AI" part starts here */
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
-    console.log("depth "+depth)
     var newGameMoves = game.ugly_moves();
-    // isEndgame(game.board());
+    console.log("isEndgame "+endgame);
+    if(endgame == false) isEndgame(game.board());
     if(isMaximisingPlayer) {
         var bestMove = -9999;
         var value = -9999;
@@ -86,48 +86,42 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
 var endgame = false 
 
 var isEndgame = function(board){
-    if(endgame == true) return true ;  
-
     let pieceCount = new Map()
+    pieceCount['blackBishop']=0,pieceCount['whiteBishop']=0,pieceCount['blackKnight']=0;
+    pieceCount['whiteKnight']=0,pieceCount['blackRook']=0,pieceCount['whiteRook']=0;
+    pieceCount['blackQueen']=0,pieceCount['whiteQueen']=0;
+
     for(var i=0; i<8; i++){
-        for(j =0; j<8 ; j++){
+        for(var j =0; j<8 ; j++){
             let piece = board[i][j];
-
-            if(piece == 'b' && piece.color == 'b'){
-                if(pieceCount.has('blackBishop')) pieceCount['blackBishop']= pieceCount['blackBishop']+1;
-                else pieceCount['blackBishop'] = 1;
+            if(piece == null) continue;
+            if(piece.type == 'b' && piece.color == 'b'){
+                pieceCount['blackBishop']= pieceCount['blackBishop']+1;
             }
 
-            else if(piece == 'b' && piece.color == 'w'){
-                if(pieceCount.has('whiteBishop')) pieceCount['whiteBishop']= pieceCount['whiteBishop']+1;
-                else pieceCount['whiteBishop'] = 1;
+            else if(piece.type == 'b' && piece.color == 'w'){
+                pieceCount['whiteBishop']= pieceCount['whiteBishop']+1;
             }
 
-            else if(piece == 'n' && piece.color == 'b'){
-                if(pieceCount.has('blackKnight')) pieceCount['blackKnight']= pieceCount['blackKnight']+1;
-                else pieceCount['blackKnight'] = 1;
+            else if(piece.type == 'n' && piece.color == 'b'){
+                pieceCount['blackKnight']= pieceCount['blackKnight']+1;
             }
 
-            else if(piece == 'n' && piece.color == 'w'){
-                if(pieceCount.has('whiteKnight')) pieceCount['whiteKnight']= pieceCount['whiteKnight']+1;
-                else pieceCount['whiteKnight'] = 1;
+            else if(piece.type == 'n' && piece.color == 'w'){
+                pieceCount['whiteKnight']= pieceCount['whiteKnight']+1;
             }
 
-            else if(piece == 'r' && piece.color == 'b'){
-                if(pieceCount.has('blackRook')) pieceCount['blackRook']= pieceCount['blackRook']+1;
-                else pieceCount['blackRook'] = 1;
+            else if(piece.type == 'r' && piece.color == 'b'){
+                pieceCount['blackRook']= pieceCount['blackRook']+1;
             }
-            else if(piece == 'r' && piece.color == 'w'){
-                if(pieceCount.has('whiteRook')) pieceCount['whiteRook']= pieceCount['whiteRook']+1;
-                else pieceCount['whiteRook'] = 1;
+            else if(piece.type == 'r' && piece.color == 'w'){
+                pieceCount['whiteRook']= pieceCount['whiteRook']+1;
             }
-            else if(piece == 'q' && piece.color == 'b'){
-                if(pieceCount.has('blackQueen')) pieceCount['blackQueen']= pieceCount['blackQueen']+1;
-                else pieceCount['blackQueen'] = 1;
+            else if(piece.type == 'q' && piece.color == 'b'){
+                pieceCount['blackQueen']= pieceCount['blackQueen']+1;
             }
-            else if(piece == 'q' && piece.color == 'w'){
-                if(pieceCount.has('whiteQueen')) pieceCount['whiteQueen']= pieceCount['whiteQueen']+1;
-                else pieceCount['whiteQueen'] = 1;
+            else if(piece.type == 'q' && piece.color == 'w'){
+                pieceCount['whiteQueen']= pieceCount['whiteQueen']+1;
             }
         }
     }
@@ -148,19 +142,19 @@ var isEndgame = function(board){
 
 var evaluateBoard = function (board, log) {
     var totalEvaluation = 0;
-    // if(isEndgame) {
-    //     for (var i = 0; i < 8; i++) {
-    //         for (var j = 0; j < 8; j++) {
-    //             totalEvaluation = totalEvaluation + getPieceValueEndgame(board[i][j], i ,j);
-    //         }
-    //     }
-    // } else {
+    if(endgame) {
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                totalEvaluation = totalEvaluation + getPieceValueEndgame(board[i][j], i ,j);
+            }
+        }
+    } else {
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
             totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
         }
     }
-// }
+}
     totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
     return totalEvaluation;
 };
@@ -275,7 +269,7 @@ var getPieceValue = function (piece, x, y) {
         } else if (piece.type === 'n') {
             return 32 + knightEval[y][x];
         } else if (piece.type === 'b') {
-            return 33 + ( isWhite ? bishopEvalWhite[y][x] : bishopEvalBlack[y][x] );
+            return 32 + ( isWhite ? bishopEvalWhite[y][x] : bishopEvalBlack[y][x] );
         } else if (piece.type === 'q') {
             return 90 + evalQueen[y][x];
         } else if (piece.type === 'k') {
@@ -337,7 +331,7 @@ var getPawnStructureScore = function(board, log) {
        br.push(countInFileOpp)
    }   
    
-   if(log) console.log("array "+ar)
+//    if(log) console.log("array "+ar)
    let isolatedPawns = 0 ;
    let isolatedPawnsOpp = 0;
    for(var i=0;i<8;i++){
@@ -358,7 +352,7 @@ var getPawnStructureScore = function(board, log) {
    let penalty = (doubledPwanOpp + isolatedPawnsOpp) * 3;
    let bonus = (doubledPawns + isolatedPawns) * 3;
    
-   if(log) console.log("isolatedPawn "+isolatedPawns+ " doubled pawns "+doubledPawns);
+//    if(log) console.log("isolatedPawn "+isolatedPawns+ " doubled pawns "+doubledPawns);
    return bonus-penalty;
 }
 
@@ -366,9 +360,7 @@ var getPawnStructureScore = function(board, log) {
 /* board visualization and games state handling */
 
 var onDragStart = function (source, piece, position, orientation) {
-    console.log("piece "+piece)
     let pat = '/^'+oppositePlayerCol+'/'
-    console.log("player "+oppositePlayerCol)
     if (game.in_checkmate() === true || game.in_draw() === true ||
         piece.search(pat) !== -1) {
         return false;
