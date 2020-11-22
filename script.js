@@ -374,11 +374,13 @@ var onDragStart = function (source, piece, position, orientation) {
         return false;
     }
     if(blackBtnDisabled == false) document.getElementById("blackOrientationBtn").disabled= true
-    if(levelButtonDisabled == false) {
+    if(gameStarted == false) {
         document.getElementById("m1").disabled= true
         document.getElementById("m2").disabled= true
         document.getElementById("m3").disabled= true
+        document.getElementById("gameStart").disabled= true;
     }
+
 };
 
 var makeBestMove = function () {
@@ -493,16 +495,24 @@ $('#blackOrientationBtn').on('click', function () {
     document.getElementById("msg").innerHTML = "You are playing with Black !!";
     board.orientation('black')
     isWhite = false
-    disableBlack = true
     playerCol = 'b'
+    document.getElementById("gameStart").disabled= true;
+    document.getElementById("m1").disabled= true
+    document.getElementById("m2").disabled= true
+    document.getElementById("m3").disabled= true
+    gameStarted = true
     makeBestMove()
 })
 
-$(":radio").click(function(){
-    var radioName = $(this).attr("name"); 
-    $(":radio[name='"+radioName+"']").attr("disabled", true); 
-    levelButtonDisabled = true
- });
+$('#gameStart').on('click', function () {
+    document.getElementById("blackOrientationBtn").disabled= true;
+    document.getElementById("gameStart").disabled= true;
+    document.getElementById("m1").disabled= true
+    document.getElementById("m2").disabled= true
+    document.getElementById("m3").disabled= true
+    gameStarted = true
+    alert('Game Started !! Make your Move')
+})
 
  var update = function(level){
      if(level == 'expert') depth = 4; 
@@ -510,12 +520,28 @@ $(":radio").click(function(){
 
  }
 
+ function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+
 var isWhite= true
 var depth = 3
 var blackBtnDisabled = false
-var levelButtonDisabled = false
 var playerCol =  'w' 
 var oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
+var gameStarted = false
+var mySound;
 
 var cfg = {
     draggable: true,
