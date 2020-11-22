@@ -6,8 +6,7 @@ var board,
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     console.log("depth "+depth)
     var newGameMoves = game.ugly_moves();
-    // let endgame = isEndgame(game.board());
-    let endgame = false;
+    // isEndgame(game.board());
     if(isMaximisingPlayer) {
         var bestMove = -9999;
         var value = -9999;
@@ -17,7 +16,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
             if(!game.in_threefold_repetition())
-                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer, endgame);
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
             game.undo();
             if(value >= bestMove) {
                 bestMove = value;
@@ -35,7 +34,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
             var newGameMove = newGameMoves[i]
             game.ugly_move(newGameMove);
             if(!game.in_threefold_repetition())
-                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer, endgame);
+                value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
             game.undo();
             if(value <= bestMove) {
                 bestMove = value;
@@ -47,10 +46,10 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     }
 };
 
-var minimax = function (depth, game, alpha, beta, isMaximisingPlayer, isEndgame) {
+var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     positionCount++;
     if (depth === 0) {
-        return -evaluateBoard(game.board(), false, isEndgame);
+        return -evaluateBoard(game.board(), false);
     }
 
     var newGameMoves = game.ugly_moves();
@@ -60,7 +59,7 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer, isEndgame)
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
             // if(!game.in_threefold_repetition())
-                bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer, isEndgame));
+                bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
             game.undo();
             alpha = Math.max(alpha, bestMove);
             if (beta <= alpha) {
@@ -73,7 +72,7 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer, isEndgame)
         for (var i = 0; i < newGameMoves.length; i++) {
             game.ugly_move(newGameMoves[i]);
             // if(!game.in_threefold_repetition())
-                bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer, isEndgame));
+                bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
             game.undo();
             beta = Math.min(beta, bestMove);
             if (beta <= alpha) {
@@ -136,18 +135,18 @@ var isEndgame = function(board){
     let totalBlack = pieceCount['blackBishop']+pieceCount['blackQueen']+pieceCount['blackRook']+pieceCount['blackKnight'];
     let totalWhite = pieceCount['whiteBishop']+pieceCount['whiteQueen']+pieceCount['whiteRook']+pieceCount['whiteKnight']
 
-    if(totalBlack > 2 || totalWhite > 2) return false;
+    if(totalBlack > 2 || totalWhite > 2) return ;
 
     if((totalBlack ==2 && pieceCount['blackQueen'] == 1) || (totalWhite == 2 && pieceCount['whiteQueen'] == 1))
-        return false;
+        return ;
 
-    if(pieceCount['blackRook'] == 2 || pieceCount['whiteRook'] == 2) return false; 
+    if(pieceCount['blackRook'] == 2 || pieceCount['whiteRook'] == 2) return ; 
     
     endgame = true;
-    return true;
+    return ;
 }
 
-var evaluateBoard = function (board, log, isEndgame) {
+var evaluateBoard = function (board, log) {
     var totalEvaluation = 0;
     // if(isEndgame) {
     //     for (var i = 0; i < 8; i++) {
@@ -162,7 +161,7 @@ var evaluateBoard = function (board, log, isEndgame) {
         }
     }
 // }
-    // totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
+    totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
     return totalEvaluation;
 };
 
