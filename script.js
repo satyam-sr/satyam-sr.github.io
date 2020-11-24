@@ -367,7 +367,6 @@ var onDragStart = function (source, piece, position, orientation) {
     }
     if(blackBtnDisabled == false) document.getElementById("blackOrientationBtn").disabled= true
     if(gameStarted == false) {
-        document.getElementById("m1").disabled= true
         document.getElementById("m2").disabled= true
         document.getElementById("m3").disabled= true
         document.getElementById("gameStart").disabled= true;
@@ -409,11 +408,9 @@ var getBestMove = function (game) {
     var bestMove = minimaxRoot(depth, game, true);
     var d2 = new Date().getTime();
     var moveTime = (d2 - d);
-    var positionsPerS = ( positionCount * 1000 / moveTime);
 
     $('#position-count').text(positionCount);
     $('#time').text(moveTime/1000 + 's');
-    $('#positions-per-s').text(positionsPerS);
     return bestMove;
 };
 
@@ -491,7 +488,6 @@ $('#blackOrientationBtn').on('click', function () {
     isWhite = false
     playerCol = 'b'
     document.getElementById("gameStart").disabled= true;
-    document.getElementById("m1").disabled= true
     document.getElementById("m2").disabled= true
     document.getElementById("m3").disabled= true
     gameStarted = true
@@ -501,7 +497,6 @@ $('#blackOrientationBtn').on('click', function () {
 $('#gameStart').on('click', function () {
     document.getElementById("blackOrientationBtn").disabled= true;
     document.getElementById("gameStart").disabled= true;
-    document.getElementById("m1").disabled= true
     document.getElementById("m2").disabled= true
     document.getElementById("m3").disabled= true
     gameStarted = true
@@ -510,8 +505,6 @@ $('#gameStart').on('click', function () {
 
  var update = function(level){
      if(level == 'expert') depth = 4; 
-     else if(level == 'basic') depth = 1;
-
  }
 
  function sound(src) {

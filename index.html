@@ -11,11 +11,10 @@
 <body>
 <div class="flexUI">
 <div id="form">
-    <h2>Welcome Visitor. Be ready for a good game of chess !!</h2>
+    <h2>Put your game face on and Be Focused !!   </h2>
     <p>Select Difficulty level</p>
-    Basic <input type="radio" id="m1" name="match1" onclick="update('basic');" />
-    Moderate <input type="radio" id="m2" name="match1" onclick="update('moderate');" checked/>
-    Expert <input type="radio" id="m3" name="match1" onclick="update('expert');" />
+    <input type="radio" id="m2" name="match1" onclick="update('moderate');" checked/> Moderate <br>
+    <input type="radio" id="m3" name="match1" onclick="update('expert');" /> Expert (takes average 15 sec. to make move)
     <p id="msg">You are playing with White !!</p>
     <button id="blackOrientationBtn">Play with Black</button>
     <button id="gameStart">Start the Game</button>
@@ -26,10 +25,9 @@
         <br>
         <span>Time: <span id="time"></span></span>
         <br>
-        <span>Positions/s: <span id="positions-per-s"></span> </span>
         <br>
-        <br>
-        <div id="move-history" class="move-history">
+        <span>Move History :</span><br><br>
+        <div id="move-history" class="move-history"> 
         </div>
     </div>
 </div>
