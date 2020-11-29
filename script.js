@@ -1,11 +1,15 @@
 var board,
     game = new Chess();   
 
+    console.log(game.board()[7][3].type, game.board()[7][3].color)    
+
 /*The "AI" part starts here */
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     var newGameMoves = game.ugly_moves();
     console.log("isEndgame "+endgame);
+    if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) castlingState(game.board(),true)
+    console.log("castle black "+blackCastledOrCantBeCastled+" white "+whiteCastledOrCantBeCastled)
     if(endgame == false) isEndgame(game.board());
     if(isMaximisingPlayer) {
         var bestMove = -9999;
@@ -137,6 +141,10 @@ var isEndgame = function(board){
     if(pieceCount['blackRook'] == 2 || pieceCount['whiteRook'] == 2) return ; 
     
     endgame = true;
+
+    if((pieceCount['blackBishop'] ==2 && oppositePlayerCol =='b') || (pieceCount['whiteBishop'] ==2 && oppositePlayerCol =='w'))
+        bishopPairBonus= 5
+    else  bishopPairBonus = 0
     return ;
 }
 
@@ -151,12 +159,13 @@ var evaluateBoard = function (board, log) {
     } else {
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
-            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
+                totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i ,j);
+            }
         }
     }
-}
-    totalEvaluation = totalEvaluation + getPawnStructureScore(board, log)
-    return totalEvaluation;
+
+    if(blackCastledOrCantBeCastled || whiteCastledOrCantBeCastled) totalEvaluation = totalEvaluation + getKingSafetyEval(board)
+    return totalEvaluation + getPawnStructureScore(board, log) + bishopPairBonus
 };
 
 var reverseArray = function(array) {
@@ -356,6 +365,101 @@ var getPawnStructureScore = function(board, log) {
    return bonus-penalty;
 }
 
+var getKingSafetyEval = function (board) {
+    let a1  = board[7][0]
+    let c1  = board[7][2]
+    let d1 = board[7][3]
+    let f1 = board[7][5]
+    let e1  = board[7][4]
+    let g1  = board[7][6]
+    let h1  = board[7][7]
+    let a8  = board[0][0]
+    let c8  = board[0][2]
+    let d8 = board[0][3]
+    let f8 = board[0][5]
+    let e8  = board[0][4]
+    let g8  = board[0][6]
+    let h8  = board[0][7]
+    let blackScore = 0
+    let whiteScore = 0
+
+    if(!whiteCastledOrCantBeCastled){
+        if((c1 !== null && c1.color === 'w' && c1.type === 'k' && d1 !== null && d1.color === 'w' && d1.type === 'r') || 
+            (g1 !== null && g1.color === 'w' && g1.type ==='k' && f1 !== null && f1.color === 'w' && f1.type === 'r')) {
+                console.log("w1")
+                whiteScore= whiteScore+5
+            }
+
+            else if(e1 === null || e1.color !== 'w' || e1.type !== 'k' || ((a1===null || a1.type !== 'r' || a1.color !== 'w')
+                 && (h1 ===  null || h1.type !== 'r' || h1.color !== 'w'))){
+                    whiteScore= whiteScore-12
+            }    
+    }
+
+    if(!blackCastledOrCantBeCastled){
+        if((c8 !== null && c8.color === 'b' && c8.type === 'k' && d8 !== null && d8.color === 'b' && d8.type === 'r') || 
+            (g8 !== null && g8.color === 'b' && g8.type === 'k' && f8 !== null && f8.color === 'b' && f8.type === 'r')) {
+                console.log("b1")
+                blackScore= blackScore+5
+            }
+
+            else if(!(e8 !== null && e8.color === 'b' && e8.type === 'k' && ((a8!==null && a8.type === 'r' && a8.color === 'b')
+                 || (h8 !== null && h8.type === 'r' && h8.color === 'b')))){
+                    blackScore= blackScore-12
+            }    
+    }
+    
+    if(oppositePlayerCol == 'w' ) return whiteScore - blackScore
+    else return blackScore - whiteScore
+
+}
+
+var castlingState = function (board, log) {
+    let a1  = board[7][0]
+    let c1  = board[7][2]
+    let d1 = board[7][3]
+    let f1 = board[7][5]
+    let e1  = board[7][4]
+    let g1  = board[7][6]
+    let h1  = board[7][7]
+    let a8  = board[0][0]
+    let c8  = board[0][2]
+    let d8 = board[0][3]
+    let f8 = board[0][5]
+    let e8  = board[0][4]
+    let g8  = board[0][6]
+    let h8  = board[0][7]
+
+    if(!whiteCastledOrCantBeCastled){
+        if((c1 != null && c1.color == 'w' && c1.type == 'k' && d1 != null && d1.color == 'w' && d1.type == 'r') || 
+            (g1 !== null && g1.color === 'w' && g1.type ==='k' && f1 != null && f1.color == 'w' && f1.type == 'r')) {
+                console.log("w1")
+                whiteCastledOrCantBeCastled = true 
+            }
+
+            else if(e1 === null || e1.color !== 'w' || e1.type !== 'k' || ((a1===null || a1.type !== 'r' || a1.color !== 'w')
+                 && (h1 ===  null || h1.type !== 'r' || h1.color !== 'w'))){
+                    console.log("w2")
+                    whiteCastledOrCantBeCastled = true 
+            }   
+    } 
+
+    if(!blackCastledOrCantBeCastled){
+        if((c8 !== null && c8.color === 'b' && c8.type === 'k' && d8 !== null && d8.color === 'b' && d8.type === 'r') || 
+            (g8 !== null && g8.color === 'b' && g8.type === 'k' && f8 !== null && f8.color === 'b' && f8.type === 'r')) {
+                console.log("b1")
+                blackCastledOrCantBeCastled = true 
+            }
+
+            else if(!(e8 !== null && e8.color === 'b' && e8.type === 'k' && ((a8!==null && a8.type === 'r' && a8.color === 'b')
+                 || (h8 !== null && h8.type === 'r' && h8.color === 'b')))){
+                    console.log("b2")
+                    blackCastledOrCantBeCastled = true 
+            }   
+    } 
+
+}
+
 
 /* board visualization and games state handling */
 
@@ -529,6 +633,10 @@ var playerCol =  'w'
 var oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
 var gameStarted = false
 var mySound = new sound("move.wav");
+
+var whiteCastledOrCantBeCastled = false
+var blackCastledOrCantBeCastled = false
+var bishopPairBonus = 0
 
 var cfg = {
     draggable: true,
