@@ -6,8 +6,7 @@ var board,
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     var newGameMoves = game.ugly_moves();
     console.log("isEndgame "+endgame);
-    if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) castlingState(game.board(),true)
-    console.log("castle black "+blackCastledOrCantBeCastled+" white "+whiteCastledOrCantBeCastled)
+    if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) castlingState(game.board())
     if(endgame == false) isEndgame(game.board());
     if(isMaximisingPlayer) {
         var bestMove = -9999;
@@ -338,7 +337,6 @@ var getPawnStructureScore = function(board, log) {
        br.push(countInFileOpp)
    }   
    
-//    if(log) console.log("array "+ar)
    let isolatedPawns = 0 ;
    let isolatedPawnsOpp = 0;
    for(var i=0;i<8;i++){
@@ -384,7 +382,6 @@ var getKingSafetyEval = function (board) {
     if(!whiteCastledOrCantBeCastled){
         if((c1 !== null && c1.color === 'w' && c1.type === 'k' && d1 !== null && d1.color === 'w' && d1.type === 'r') || 
             (g1 !== null && g1.color === 'w' && g1.type ==='k' && f1 !== null && f1.color === 'w' && f1.type === 'r')) {
-                console.log("w1")
                 whiteScore= whiteScore+5
             }
 
@@ -397,7 +394,6 @@ var getKingSafetyEval = function (board) {
     if(!blackCastledOrCantBeCastled){
         if((c8 !== null && c8.color === 'b' && c8.type === 'k' && d8 !== null && d8.color === 'b' && d8.type === 'r') || 
             (g8 !== null && g8.color === 'b' && g8.type === 'k' && f8 !== null && f8.color === 'b' && f8.type === 'r')) {
-                console.log("b1")
                 blackScore= blackScore+5
             }
 
@@ -412,7 +408,7 @@ var getKingSafetyEval = function (board) {
 
 }
 
-var castlingState = function (board, log) {
+var castlingState = function (board) {
     let a1  = board[7][0]
     let c1  = board[7][2]
     let d1 = board[7][3]
@@ -427,21 +423,15 @@ var castlingState = function (board, log) {
     let e8  = board[0][4]
     let g8  = board[0][6]
     let h8  = board[0][7]
-    let blackScore = 0
-    let whiteScore = 0
 
     if(!whiteCastledOrCantBeCastled){
         if((c1 != null && c1.color == 'w' && c1.type == 'k' && d1 != null && d1.color == 'w' && d1.type == 'r') || 
             (g1 !== null && g1.color === 'w' && g1.type ==='k' && f1 != null && f1.color == 'w' && f1.type == 'r')) {
-                console.log("w1")
-                whiteScore = 5
                 whiteCastledOrCantBeCastled = true 
             }
 
             else if(e1 === null || e1.color !== 'w' || e1.type !== 'k' || ((a1===null || a1.type !== 'r' || a1.color !== 'w')
                  && (h1 ===  null || h1.type !== 'r' || h1.color !== 'w'))){
-                    console.log("w2")
-                    whiteScore = -12
                     whiteCastledOrCantBeCastled = true 
             }   
     } 
@@ -449,19 +439,14 @@ var castlingState = function (board, log) {
     if(!blackCastledOrCantBeCastled){
         if((c8 !== null && c8.color === 'b' && c8.type === 'k' && d8 !== null && d8.color === 'b' && d8.type === 'r') || 
             (g8 !== null && g8.color === 'b' && g8.type === 'k' && f8 !== null && f8.color === 'b' && f8.type === 'r')) {
-                console.log("b1")
-                blackScore = 5
                 blackCastledOrCantBeCastled = true 
             }
 
             else if(!(e8 !== null && e8.color === 'b' && e8.type === 'k' && ((a8!==null && a8.type === 'r' && a8.color === 'b')
                  || (h8 !== null && h8.type === 'r' && h8.color === 'b')))){
-                    console.log("b2")
-                    blackScore = -12
                     blackCastledOrCantBeCastled = true 
             }   
     } 
-    console.log("whiteScore "+whiteScore+" blackScore "+blackScore)
 
 }
 
