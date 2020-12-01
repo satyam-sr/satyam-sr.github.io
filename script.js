@@ -5,6 +5,7 @@ var board,
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     var newGameMoves = game.ugly_moves();
+    console.log("machine color "+oppositePlayerCol)
     console.log("isEndgame "+endgame);
     if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) castlingState(game.board())
     if(endgame == false) isEndgame(game.board());
@@ -130,6 +131,14 @@ var isEndgame = function(board){
     let totalBlack = pieceCount['blackBishop']+pieceCount['blackQueen']+pieceCount['blackRook']+pieceCount['blackKnight'];
     let totalWhite = pieceCount['whiteBishop']+pieceCount['whiteQueen']+pieceCount['whiteRook']+pieceCount['whiteKnight']
 
+    var whiteScore = 0
+    var blackScore = 0
+    if(pieceCount['blackBishop'] == 2) blackScore = 5
+    if(pieceCount['whiteBishop'] == 2) whiteScore = 5
+    
+    if(oppositePlayerCol == 'w') bishopPairBonus = blackScore - whiteScore
+    else bishopPairBonus = whiteScore - blackScore
+    
     if(totalBlack > 2 || totalWhite > 2) return ;
 
     if((totalBlack ==2 && pieceCount['blackQueen'] == 1) || (totalWhite == 2 && pieceCount['whiteQueen'] == 1))
@@ -138,10 +147,6 @@ var isEndgame = function(board){
     if(pieceCount['blackRook'] == 2 || pieceCount['whiteRook'] == 2) return ; 
     
     endgame = true;
-
-    if((pieceCount['blackBishop'] ==2 && oppositePlayerCol =='b') || (pieceCount['whiteBishop'] ==2 && oppositePlayerCol =='w'))
-        bishopPairBonus= 5
-    else  bishopPairBonus = 0
     return ;
 }
 
@@ -358,7 +363,7 @@ var getPawnStructureScore = function(board, log) {
    let bonus = (doubledPawns + isolatedPawns) * 3;
    
 //    if(log) console.log("isolatedPawn "+isolatedPawns+ " doubled pawns "+doubledPawns);
-   return bonus-penalty;
+   return penalty-bonus;
 }
 
 var getKingSafetyEval = function (board) {
@@ -403,7 +408,7 @@ var getKingSafetyEval = function (board) {
             }    
     }
     
-    if(oppositePlayerCol == 'w' ) return whiteScore - blackScore
+    if(oppositePlayerCol == 'b' ) return whiteScore - blackScore
     else return blackScore - whiteScore
 
 }
