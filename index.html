@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <title>Chess Engine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="lib/chessboardjs/css/chessboard-0.3.0.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="flexUI">
 <div id="form">
-    <h2>Welcome Visitor. Be ready for a good game of chess !!</h2>
+    <h2>Put your game face on and Be Focused !!   </h2>
     <p>Select Difficulty level</p>
-    Basic <input type="radio" id="m1" name="match1" onclick="update('basic');" />
-    Moderate <input type="radio" id="m2" name="match1" onclick="update('moderate');" checked/>
-    Expert <input type="radio" id="m3" name="match1" onclick="update('expert');" />
+    <input type="radio" id="m2" name="match1" onclick="update('moderate');" checked/> Moderate <br>
+    <input type="radio" id="m3" name="match1" onclick="update('expert');" /> Expert (takes average 15 sec. to make move)
     <p id="msg">You are playing with White !!</p>
-    <button id="blackOrientationBtn" onclick="disableBlack();">Play with Black</button>
+    <button id="blackOrientationBtn">Play with Black</button>
+    <button id="gameStart">Start the Game</button>
 
     <div class="info">
         <br>
@@ -24,15 +25,13 @@
         <br>
         <span>Time: <span id="time"></span></span>
         <br>
-        <span>Positions/s: <span id="positions-per-s"></span> </span>
         <br>
-        <br>
-        <div id="move-history" class="move-history">
+        <span>Move History :</span><br><br>
+        <div id="move-history" class="move-history"> 
         </div>
     </div>
 </div>
 <div id="board" class="board"></div>
-<script src="lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="lib/chessboardjs/js/chess.js"></script>
 <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
 <script src="script.js"></script>
