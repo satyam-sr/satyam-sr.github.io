@@ -5,8 +5,6 @@ var board,
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
     var newGameMoves = game.ugly_moves();
-    console.log("machine color "+oppositePlayerCol)
-    console.log("isEndgame "+endgame);
     if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) castlingState(game.board())
     if(endgame == false) isEndgame(game.board());
     if(isMaximisingPlayer) {
@@ -51,7 +49,7 @@ var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     positionCount++;
     if (depth === 0) {
-        return -evaluateBoard(game.board(), false);
+        return -evaluateBoard(game.board());
     }
 
     var newGameMoves = game.ugly_moves();
@@ -150,7 +148,7 @@ var isEndgame = function(board){
     return ;
 }
 
-var evaluateBoard = function (board, log) {
+var evaluateBoard = function (board) {
     var totalEvaluation = 0;
     if(endgame) {
         for (var i = 0; i < 8; i++) {
@@ -167,7 +165,7 @@ var evaluateBoard = function (board, log) {
     }
 
     if(!(blackCastledOrCantBeCastled && whiteCastledOrCantBeCastled)) totalEvaluation = totalEvaluation + getKingSafetyEval(board)
-    return totalEvaluation + getPawnStructureScore(board, log) + bishopPairBonus
+    return totalEvaluation + getPawnStructureScore(board) + bishopPairBonus
 };
 
 var reverseArray = function(array) {
@@ -319,7 +317,7 @@ var getPieceValueEndgame = function (piece, x, y) {
     return piece.color === playerCol ? absoluteValue : -absoluteValue;
 };
 
-var getPawnStructureScore = function(board, log) {
+var getPawnStructureScore = function(board) {
 
     var doubledPawns = 0; 
     var doubledPwanOpp = 0
@@ -486,7 +484,6 @@ var makeBestMove = function () {
 
 var makeFirstMoveWithWhite = function () {
     var randomNumber = Math.floor(Math.random() * 4); 
-    console.log("random "+randomNumber)
     if(randomNumber%4 == 0) game.move('c4');
     else if(randomNumber % 4 == 1) game.move('d4');
     else if(randomNumber % 4 == 2) game.move('e4');
