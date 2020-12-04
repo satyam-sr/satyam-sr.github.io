@@ -138,7 +138,7 @@ var isEndgame = function(board){
     
     if(oppositePlayerCol == 'w') bishopPairBonus = blackScore - whiteScore
     else bishopPairBonus = whiteScore - blackScore
-    
+
     if(totalBlack > 2 || totalWhite > 2) return ;
 
     if((totalBlack ==2 && pieceCount['blackQueen'] == 1) || (totalWhite == 2 && pieceCount['whiteQueen'] == 1))
@@ -484,6 +484,24 @@ var makeBestMove = function () {
     }
 };
 
+var makeFirstMoveWithWhite = function () {
+    var randomNumber = Math.floor(Math.random() * 4); 
+    console.log("random "+randomNumber)
+    if(randomNumber%4 == 0) game.move('c4');
+    else if(randomNumber % 4 == 1) game.move('d4');
+    else if(randomNumber % 4 == 2) game.move('e4');
+    else {
+        var bestMove = getBestMove(game);
+        game.ugly_move(bestMove);
+    }
+    board.position(game.fen());
+    renderMoveHistory(game.history());
+    mySound.play();
+    if (game.game_over()) {
+        handleGameOver(game)
+    }
+};
+
 var handleGameOver = function(game) {
     if (game.in_draw()) window.setTimeout(alert('Game Drawn'),600)
     else if (game.in_stalemate())  window.setTimeout(alert('Stalemate ! Game Drawn'),600)
@@ -586,11 +604,13 @@ $('#blackOrientationBtn').on('click', function () {
     board.orientation('black')
     isWhite = false
     playerCol = 'b'
+    oppositePlayerCol = 'w'
     document.getElementById("gameStart").disabled= true;
     document.getElementById("m2").disabled= true
     document.getElementById("m3").disabled= true
     gameStarted = true
-    makeBestMove()
+    makeFirstMoveWithWhite()
+    // makeBestMove()
 })
 
 $('#gameStart').on('click', function () {
@@ -625,7 +645,7 @@ var isWhite= true
 var depth = 3
 var blackBtnDisabled = false
 var playerCol =  'w' 
-var oppositePlayerCol= (isWhite === true) ? 'b' : 'w'
+var oppositePlayerCol= 'b' 
 var gameStarted = false
 var mySound = new sound("move.wav");
 
